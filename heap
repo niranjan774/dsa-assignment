@@ -1,0 +1,347 @@
+#include <stdio.h>
+
+#define K 3
+#define N 4
+#define TOTAL 12
+
+/* ---------------------------------------------------
+   Structure for a Min Heap Node
+   --------------------------------------------------- */
+typedef struct
+{
+    int value;      // Current value
+    int listNo;     // Which list it belongs to
+    int index;      // Position in that list
+} HeapNode;
+
+/* Global counters */
+int heapComparisons = 0;
+int pairComparisons = 0;
+
+/* ---------------------------------------------------
+   Swap two heap nodes
+   --------------------------------------------------- */
+void swap(HeapNode *a, HeapNode *b)
+{
+    HeapNode temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+/* ---------------------------------------------------
+   Display Heap
+   --------------------------------------------------- */
+void displayHeap(HeapNode heap[], int size)
+{
+    int i;
+
+    printf("Heap: ");
+
+    for (i = 0; i < size; i++)
+    {
+        printf("%d ", heap[i].value);
+    }
+
+    printf("\n");
+}
+
+/* ---------------------------------------------------
+   Heapify Down
+   --------------------------------------------------- */
+void minHeapify(HeapNode heap[], int size, int i)
+{
+    int smallest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < size)
+    {
+        heapComparisons++;
+
+        if (heap[left].value < heap[smallest].value)
+            smallest = left;
+    }
+
+    if (right < size)
+    {
+        heapComparisons++;
+
+        if (heap[right].value < heap[smallest].value)
+            smallest = right;
+    }
+
+    if (smallest != i)
+    {
+        swap(&heap[i], &heap[smallest]);
+        minHeapify(heap, size, smallest);
+    }
+}
+
+/* ---------------------------------------------------
+   Build Min Heap
+   --------------------------------------------------- */
+void buildMinHeap(HeapNode heap[], int size)
+{
+    int i;
+
+    for (i = size / 2 - 1; i >= 0; i--)
+    {
+        minHeapify(heap, size, i);
+    }
+}
+
+/* ---------------------------------------------------
+   K-Way Merge using Min Heap
+   --------------------------------------------------- */
+void kWayMerge(int lists[K][N])
+{
+    HeapNode heap[K];
+
+    int result[TOTAL];
+    int heapSize = K;
+
+    int i;
+    int count = 0;
+
+    printf("\n====================================\n");
+    printf("      K-WAY MERGE USING MIN HEAP\n");
+    printf("====================================\n");
+
+    /* Put first element of every list into heap */
+    for (i = 0; i < K; i++)
+    {
+        heap[i].value = lists[i][0];
+        heap[i].listNo = i;
+        heap[i].index = 0;
+    }
+
+    /* Build initial heap */
+    buildMinHeap(heap, heapSize);
+
+    printf("\nInitial heap:\n");
+    displayHeap(heap, heapSize);
+
+    /* Continue until heap becomes empty */
+    while (heapSize > 0)
+    {
+        HeapNode minNode;
+
+        /* Root contains minimum element */
+        minNode = heap[0];
+
+        result[count++] = minNode.value;
+
+        printf("\nSelected minimum = %d", minNode.value);
+
+        /*
+           If the selected list has another element,
+           replace root with next element.
+        */
+        if (minNode.index + 1 < N)
+        {
+            heap[0].value =
+                lists[minNode.listNo][minNode.index + 1];
+
+            heap[0].listNo = minNode.listNo;
+            heap[0].index = minNode.index + 1;
+
+            minHeapify(heap, heapSize, 0);
+        }
+        else
+        {
+            /*
+               Current list is finished.
+               Remove root from heap.
+            */
+            heap[0] = heap[heapSize - 1];
+            heapSize--;
+
+            if (heapSize > 0)
+                minHeapify(heap, heapSize, 0);
+        }
+
+        printf("\nHeap after operation:\n");
+
+        if (heapSize > 0)
+            displayHeap(heap, heapSize);
+        else
+            printf("Heap is empty\n");
+    }
+
+    /* Display final result */
+    printf("\nFinal K-way merged list:\n");
+
+    for (i = 0; i < TOTAL; i++)
+    {
+        printf("%d ", result[i]);
+    }
+
+    printf("\n");
+
+    printf("\nHeap size = %d\n", K);
+    printf("Number of heap comparisons = %d\n",
+           heapComparisons);
+
+    printf("Time Complexity = O(N log K)\n");
+    printf("Space Complexity = O(K + N)\n");
+}
+
+/* ---------------------------------------------------
+   Merge Two Sorted Arrays
+   --------------------------------------------------- */
+int mergeTwoLists(int a[], int n1,
+                  int b[], int n2,
+                  int result[])
+{
+    int i = 0;
+    int j = 0;
+    int k = 0;
+
+    while (i < n1 && j < n2)
+    {
+        pairComparisons++;
+
+        if (a[i] < b[j])
+        {
+            result[k++] = a[i++];
+        }
+        else
+        {
+            result[k++] = b[j++];
+        }
+    }
+
+    /* Copy remaining elements */
+    while (i < n1)
+    {
+        result[k++] = a[i++];
+    }
+
+    while (j < n2)
+    {
+        result[k++] = b[j++];
+    }
+
+    return k;
+}
+
+/* ---------------------------------------------------
+   Pairwise Merge
+   --------------------------------------------------- */
+void pairwiseMerge(int lists[K][N])
+{
+    int firstMerge[8];
+    int finalResult[12];
+
+    int i;
+
+    printf("\n====================================\n");
+    printf("       PAIRWISE MERGING\n");
+    printf("====================================\n");
+
+    /* Merge L1 and L2 */
+    int size1 = mergeTwoLists(
+        lists[0], N,
+        lists[1], N,
+        firstMerge);
+
+    printf("\nAfter merging L1 and L2:\n");
+
+    for (i = 0; i < size1; i++)
+    {
+        printf("%d ", firstMerge[i]);
+    }
+
+    /* Merge result with L3 */
+    int finalSize = mergeTwoLists(
+        firstMerge, size1,
+        lists[2], N,
+        finalResult);
+
+    printf("\n\nAfter merging with L3:\n");
+
+    for (i = 0; i < finalSize; i++)
+    {
+        printf("%d ", finalResult[i]);
+    }
+
+    printf("\n");
+
+    printf("\nNumber of pairwise comparisons = %d\n",
+           pairComparisons);
+
+    printf("Time Complexity = O(NK)\n");
+    printf("Space Complexity = O(N)\n");
+}
+
+/* ---------------------------------------------------
+   Main Function
+   --------------------------------------------------- */
+int main()
+{
+    /*
+       Three already sorted lists
+       
+       L1 = 10, 30, 50, 70
+       L2 = 20, 40, 60, 80
+       L3 = 15, 35, 55, 75
+    */
+
+    int lists[K][N] =
+    {
+        {10, 30, 50, 70},
+        {20, 40, 60, 80},
+        {15, 35, 55, 75}
+    };
+
+    printf("====================================\n");
+    printf("        K-WAY MERGE PROGRAM\n");
+    printf("====================================\n");
+
+    printf("\nInput Lists:\n");
+
+    printf("L1: ");
+    for (int i = 0; i < N; i++)
+        printf("%d ", lists[0][i]);
+
+    printf("\nL2: ");
+    for (int i = 0; i < N; i++)
+        printf("%d ", lists[1][i]);
+
+    printf("\nL3: ");
+    for (int i = 0; i < N; i++)
+        printf("%d ", lists[2][i]);
+
+    printf("\n");
+
+    /* Part A - K-way merge */
+    kWayMerge(lists);
+
+    /* Part B - Pairwise merge */
+    pairwiseMerge(lists);
+
+    /* Part C - Comparison */
+    printf("\n====================================\n");
+    printf("             COMPARISON\n");
+    printf("====================================\n");
+
+    printf("\n1. Heap Size:\n");
+    printf("   K-way merge = %d elements\n", K);
+
+    printf("\n2. Comparisons:\n");
+    printf("   K-way merge = %d\n", heapComparisons);
+    printf("   Pairwise merge = %d\n", pairComparisons);
+
+    printf("\n3. Time Complexity:\n");
+    printf("   K-way merge = O(N log K)\n");
+    printf("   Pairwise merge = O(NK)\n");
+
+    printf("\n4. Space Requirements:\n");
+    printf("   K-way merge = O(K + N)\n");
+    printf("   Pairwise merge = O(N)\n");
+
+    printf("\n5. For a large number of sorted files:\n");
+    printf("   K-way merge using a Min Heap is more scalable.\n");
+
+    return 0;
+}
