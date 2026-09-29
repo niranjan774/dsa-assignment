@@ -1,0 +1,107 @@
+====================================
+        K-WAY MERGE PROGRAM
+====================================
+
+Input Lists:
+L1: 10 30 50 70 
+L2: 20 40 60 80 
+L3: 15 35 55 75 
+
+====================================
+      K-WAY MERGE USING MIN HEAP
+====================================
+
+Initial heap:
+Heap: 10 20 15 
+
+Selected minimum = 10
+Heap after operation:
+Heap: 15 20 30 
+
+Selected minimum = 15
+Heap after operation:
+Heap: 20 35 30 
+
+Selected minimum = 20
+Heap after operation:
+Heap: 30 35 40 
+
+Selected minimum = 30
+Heap after operation:
+Heap: 35 40 50 
+
+Selected minimum = 35
+Heap after operation:
+Heap: 40 55 50 
+
+Selected minimum = 40
+Heap after operation:
+Heap: 50 55 60 
+
+Selected minimum = 50
+Heap after operation:
+Heap: 55 70 60 
+
+Selected minimum = 55
+Heap after operation:
+Heap: 60 70 75 
+
+Selected minimum = 60
+Heap after operation:
+Heap: 70 75 80 
+
+Selected minimum = 70
+Heap after operation:
+Heap: 75 80 
+
+Selected minimum = 75
+Heap after operation:
+Heap: 80 
+
+Selected minimum = 80
+Heap after operation:
+Heap is empty
+
+Final K-way merged list:
+10 15 20 30 35 40 50 55 60 70 75 80 
+
+Heap size = 3
+Number of heap comparisons = 18
+Time Complexity = O(N log K)
+Space Complexity = O(K + N)
+
+====================================
+       PAIRWISE MERGING
+====================================
+
+After merging L1 and L2:
+10 20 30 40 50 60 70 80 
+
+After merging with L3:
+10 15 20 30 35 40 50 55 60 70 75 80 
+
+Number of pairwise comparisons = 15
+Time Complexity = O(NK)
+Space Complexity = O(N)
+
+====================================
+             COMPARISON
+====================================
+
+1. Heap Size:
+   K-way merge = 3 elements
+
+2. Comparisons:
+   K-way merge = 18
+   Pairwise merge = 15
+
+3. Time Complexity:
+   K-way merge = O(N log K)
+   Pairwise merge = O(NK)
+
+4. Space Requirements:
+   K-way merge = O(K + N)
+   Pairwise merge = O(N)
+
+5. For a large number of sorted files:
+   K-way merge using a Min Heap is more scalable.
